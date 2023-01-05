@@ -1,6 +1,24 @@
-#include <cmath>
-
 #include "header.h"
+
+double Sin(float k) {
+    return (round(sin(k) * 10000) / 10000);
+}
+
+double Cos(float k) {
+    return (round(cos(k) * 10000) / 10000);
+}
+
+double Tg(float k) {
+    double a = Cos(k);
+    double b = Sin(k);
+    return (b / a);
+}
+
+double Ctg(float k) {
+    double a = Cos(k);
+    double b = Sin(k);
+    return (a / b);
+}
 
 float count_RPN(const std::string &str) {
     std::string loc_str = str + ' ';
@@ -10,6 +28,8 @@ float count_RPN(const std::string &str) {
         if (loc_str[i] != ' ') {
             if ((loc_str[i] >= '0' and loc_str[i] <= '9') or loc_str[i] == '.') {
                 tmp_el_num += loc_str[i];
+            } else if (loc_str[i] == 'P') {
+                buff.push(std::numbers::pi);
             } else {
                 tmp_el_operation += loc_str[i];
             }
@@ -45,19 +65,19 @@ float count_RPN(const std::string &str) {
                 } else if (tmp_el_operation == "sin") {
                     float a = buff.top();
                     buff.pop();
-                    buff.push(std::sin(a));
+                    buff.push(Sin(a));
                 } else if (tmp_el_operation == "cos") {
                     float a = buff.top();
                     buff.pop();
-                    buff.push(std::cos(a));
+                    buff.push(Cos(a));
                 } else if (tmp_el_operation == "tg") {
                     float a = buff.top();
                     buff.pop();
-                    buff.push(std::tan(a));
+                    buff.push(Tg(a));
                 } else if (tmp_el_operation == "ctg") {
                     float a = buff.top();
                     buff.pop();
-                    buff.push(1 / std::tan(a));
+                    buff.push(1 / Ctg(a));
                 } else if (tmp_el_operation == "exp") {
                     float a = buff.top();
                     buff.pop();

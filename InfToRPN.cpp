@@ -89,7 +89,7 @@ std::string infix_to_RPN(const std::string &str) {
                 rez += tmp;
                 tmp = "";
             }
-            if (el >= 'a' and el <= 'z') {
+            if ((el >= 'a' and el <= 'z') or el == 'P') {
                 switch (el) {
                     case 's':
                         sin_search = true;
@@ -111,6 +111,10 @@ std::string infix_to_RPN(const std::string &str) {
                         exp_search = true;
                         search_flag = true;
                         tmp += el;
+                        break;
+                    case 'P':
+                        rez += "P ";
+                        prev_el_is_num = true;
                         break;
                     case 'x':
                         if (!is_x_defined) {
@@ -172,6 +176,7 @@ std::string infix_to_RPN(const std::string &str) {
         }
         std::string fsymbs = "nsgp";
         std::string symbs = "-+*/nsgp";
+        std::string alls = "nsgpPx";
         if (!firstel)
             if ((prev_el == "." and (el > '9' or el < '0')) or
                 (symbs.substr(1, 3).find(*str.begin()) != std::string::npos) or
@@ -190,7 +195,7 @@ std::string infix_to_RPN(const std::string &str) {
             case '7':
             case '8':
             case '9':
-                if (prev_el == ")" or prev_el == "x") {
+                if (prev_el == ")" or prev_el == "x" or prev_el == "P") {
                     std::cerr << "Error: Invalid expression [invalid symbol before number]" << std::endl;
                     exit(1);
                 }
@@ -205,18 +210,25 @@ std::string infix_to_RPN(const std::string &str) {
                 }
                 break;
             case '(':
+                if ((prev_el[0] >= '0' and prev_el[0] <= '9') or prev_el[0] == 'x' or prev_el[0] == 'P') {
+                    std::cerr << "Error: Invalid expression [missing operator]" << std::endl;
+                    exit(1);
+                }
+                break;
             case 'x':
             case 's':
             case 'c':
             case 't':
             case 'e':
-                if (prev_el[0] >= '0' and prev_el[0] <= '9') {
-                    std::cerr << "Error: Invalid expression [missing operator]" << std::endl;
+            case 'P':
+                if ((prev_el[0] >= '0' and prev_el[0] <= '9') or (alls.contains(prev_el[0]))) {
+                    std::cerr << "Error: Invalid expression [double function]" << std::endl;
                     exit(1);
                 }
                 break;
             case ')':
-                if ((prev_el[0] < '0' or prev_el[0] > '9') and prev_el[0] != 'x') {
+                if ((prev_el[0] < '0' or prev_el[0] > '9') and prev_el[0] != 'x' and prev_el[0] != ')' and
+                    prev_el[0] != '(' and prev_el[0] != 'P') {
                     std::cerr << "Error: Invalid expression [operator right before closing bracket]" << std::endl;
                     exit(1);
                 }
